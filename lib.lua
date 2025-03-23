@@ -597,21 +597,13 @@ function self:LoadConfig(name)
         return
     end
     _G.LoadingConfig = true
-    local totalFlags = 0
-    local loadedFlags = 0
-
     local s, e = pcall(function()
         setByConfig = true
         local configData = http:JSONDecode(cfg)
 
         for flag, value in next, configData do
             local option = library.options[flag]
-
-            print("Processing flag: " .. flag)
-
             if option then
-                totalFlags = totalFlags + 1
-
                 if option.class == 'toggle' then
                     option:SetState(value == nil and false or (value == 1 and true or false))
                 elseif option.class == 'slider' then
@@ -626,26 +618,18 @@ function self:LoadConfig(name)
                 elseif option.class == 'box' then
                     option:SetInput(value == nil and '' or value)
                 end
-
-                loadedFlags = loadedFlags + 1
-                print("Successfully loaded flag: " .. flag)
-            else
-                print("Flag not found in library.options: " .. flag)
             end
         end
         setByConfig = false
     end)
 
     if s then
-        self:SendNotification('Successfully loaded config: '..name..' ('..loadedFlags..' out of '..totalFlags..' flags loaded)', 5, c3new(0, 1, 0))
-	_G.LoadingConfig = false
-        print("Total flags processed: " .. totalFlags .. ", successfully loaded: " .. loadedFlags)
+        self:SendNotification('Successfully loaded config: '..name, 5, c3new(0, 1, 0))
+        _G.LoadingConfig = false
     else
         self:SendNotification('Error loading config: '..tostring(e)..'. ('..tostring(name)..')', 5, c3new(1, 0, 0))
-        print("Error loading config: "..tostring(e))
     end
 end
-
 
 function self:SaveConfig(name)
     if not self:GetConfig(name) then
